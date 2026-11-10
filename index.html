@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-full bg-[#F2F2F7] text-[#1C1C1E] dark:bg-[#000000] dark:text-[#F2F2F7] transition-colors duration-200">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DocShift">
+  <meta name="description" content="DocShift — iOS Health Clinical Operating HUD for Indian MBBS Medical Officers (PHC, CHC, Casualty)">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <title>DocShift v2.2.0 — iOS Clinical Operating HUD for Medical Officers</title>
+  
+  <!-- Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'SF Mono', 'Menlo', 'Consolas', 'monospace']
+          },
+          colors: {
+            ios: {
+              blue: '#007AFF',
+              green: '#34C759',
+              amber: '#FF9500',
+              red: '#FF3B30',
+              teal: '#30B0C7',
+              indigo: '#5856D6',
+              bgLight: '#F2F2F7',
+              cardLight: '#FFFFFF',
+              bgDark: '#000000',
+              cardDark: '#1C1C1E',
+              secondaryDark: '#2C2C2E',
+              tertiaryDark: '#3A3A3C'
+            },
+            zinc: {
+              850: '#18181b',
+              900: '#121215',
+              950: '#09090b'
+            }
+          },
+          boxShadow: {
+            '2xs': '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
+            'xs': '0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06)',
+            'ios': '0 2px 14px 0 rgba(0, 0, 0, 0.06)',
+            'ios-dark': '0 4px 20px 0 rgba(0, 0, 0, 0.4)',
+            'glow-blue': '0 0 16px -2px rgba(0, 122, 255, 0.3)',
+            'glow-green': '0 0 16px -2px rgba(52, 199, 89, 0.3)',
+            'glow-red': '0 0 16px -2px rgba(255, 59, 48, 0.3)',
+            'glow-amber': '0 0 16px -2px rgba(255, 149, 0, 0.3)'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Apple iOS High-Precision Swiss-grade Clinical Typography */
+    body { font-feature-settings: "cv02", "cv03", "cv04", "cv11"; -webkit-tap-highlight-color: transparent; }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+    
+    /* Apple iOS Pill Slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+      touch-action: pan-y;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 9999px;
+      background: #E5E5EA;
+    }
+    .dark input[type=range]::-webkit-slider-runnable-track {
+      background: #3A3A3C;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 28px;
+      width: 28px;
+      border-radius: 9999px;
+      background: #FFFFFF;
+      border: 0.5px solid rgba(0,0,0,0.04);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1);
+      cursor: pointer;
+      margin-top: -10px;
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .dark input[type=range]::-webkit-slider-thumb {
+      background: #FFFFFF;
+      border: 0.5px solid rgba(255,255,255,0.2);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.6);
+    }
+    input[type=range]:active::-webkit-slider-thumb {
+      transform: scale(1.15);
+    }
+    
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* High-contrast Focus-Visible Rings (WCAG 2.1 AA) */
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid #007AFF !important;
+      outline-offset: 2px !important;
+    }
+
+    /* Print Formatting for Official Government Letterhead */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+      }
+      header, nav, #dynamic-island-capsule, #search-modal-overlay, #toast-notification, .no-print {
+        display: none !important;
+      }
+      main {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      #hub-legal {
+        display: block !important;
+      }
+      .print-only-doc {
+        display: block !important;
+        border: 2px solid #000 !important;
+        padding: 20px !important;
+        margin: 0 !important;
+        page-break-inside: avoid;
+      }
+    }
+
+    /* Mobile scroll clearance with iOS safe-area handling */
+    body {
+      padding-bottom: calc(100px + env(safe-area-inset-bottom, 24px)) !important;
+    }
+    @media (min-width: 768px) {
+      body {
+        padding-bottom: 2.5rem !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#007AFF] selection:text-white">
+
+  <!-- PWA INSTALL HOOK BANNER -->
+  <div id="pwa-install-banner" class="hidden bg-[#007AFF] text-white px-4 py-2 text-xs flex items-center justify-between z-50 shadow-md">
+    <div class="flex items-center gap-2">
+      <span class="text-base">📲</span>
+      <span class="font-medium">Install DocShift for 100% offline hospital access on this device</span>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <button onclick="installPwa()" class="px-3 py-1 bg-white text-[#007AFF] font-bold rounded-full shadow-xs text-[11px] active:scale-95 transition">Install App</button>
+      <button onclick="dismissPwaBanner()" class="p-1 text-white/80 hover:text-white text-xs">✕</button>
+    </div>
+  </div>
+
+  <!-- TOP APPLE CLINICAL COMMAND HUD -->
+  <header class="bg-white/85 dark:bg-[#1C1C1E]/85 backdrop-blur-2xl border-b border-black/[0.06] dark:border-white/[0.08] sticky top-0 z-40 transition-colors shadow-xs">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between h-14">
+      
+      <!-- Brand & Facility Indicator -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-[#007AFF] text-white flex items-center justify-center font-black text-xs tracking-tighter shadow-sm">
+          DS
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="font-black text-sm tracking-tight text-[#1C1C1E] dark:text-white leading-none">DocShift</h1>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#007AFF]/10 dark:bg-[#007AFF]/20 text-[#007AFF] dark:text-[#30B0C7] border border-[#007AFF]/20 tracking-wide uppercase">
+              Clinical HUD
+            </span>
+          </div>
+          <p class="text-[10px] text-slate-500 dark:text-zinc-400 font-medium leading-none mt-0.5 hidden sm:block">PHC • CHC • Casualty (NLEM • ICMR • BNS)</p>
+        </div>
+      </div>
+
+      <!-- DESKTOP 3-HUB MASTER SEGMENTED PILL DOCK -->
+      <div class="hidden md:flex items-center gap-1 bg-[#E5E5EA] dark:bg-[#2C2C2E] p-1 rounded-full border border-black/[0.04] dark:border-white/[0.06]" role="tablist" aria-label="Clinical Hub Navigation">
+        <button id="btn-hub-opd" onclick="switchHub('opd')" role="tab" aria-selected="true" class="hub-btn active-hub flex items-center gap-2 px-4 py-1.5 text-xs font-bold rounded-full text-[#1C1C1E] dark:text-white bg-white dark:bg-[#1C1C1E] shadow-sm transition active:scale-95">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M10 16c.5.5 1.5.5 2 0"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"/></svg>
+          <span>OPD Workbench</span>
+        </button>
+        <button id="btn-hub-emergency" onclick="switchHub('emergency')" role="tab" aria-selected="false" class="hub-btn flex items-center gap-2 px-4 py-1.5 text-xs font-bold rounded-full text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition active:scale-95">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          <span>Casualty & Resus</span>
+        </button>
+        <button id="btn-hub-legal" onclick="switchHub('legal')" role="tab" aria-selected="false" class="hub-btn flex items-center gap-2 px-4 py-1.5 text-xs font-bold rounded-full text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition active:scale-95">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/></svg>
+          <span>Forensic & Referral</span>
+        </button>
+      </div>
+
+      <!-- Right Action Bar -->
+      <div class="flex items-center gap-2">
+        <!-- Spotlight Search Pill -->
+        <button onclick="openSearchModal()" aria-label="Open Spotlight Search" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E5E5EA]/70 dark:bg-[#2C2C2E]/70 text-[#1C1C1E] dark:text-zinc-200 border border-black/[0.04] dark:border-white/[0.06] text-xs hover:bg-[#E5E5EA] dark:hover:bg-[#2C2C2E] transition active:scale-95">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span class="text-[11px] font-semibold hidden sm:inline">Spotlight</span>
+          <kbd class="text-[9px] font-mono bg-white dark:bg-[#1C1C1E] px-1.5 py-0.5 rounded-md shadow-2xs">⌘K</kbd>
+        </button>
+
+        <!-- Offline Sentinel Badge -->
+        <div class="hidden sm:flex items-center gap-1.5 text-xs text-[#34C759] bg-[#34C759]/10 px-2.5 py-1 rounded-full border border-[#34C759]/20" title="All protocols, datasets, and calculators are loaded 100% offline">
+          <span class="w-2 h-2 rounded-full bg-[#34C759] animate-pulse"></span>
+          <span class="text-[10px] font-bold tracking-tight">Offline Lock</span>
+        </div>
+
+        <!-- Night Shift Mode Toggle -->
+        <button id="theme-toggle-btn" onclick="toggleDarkMode()" aria-label="Toggle Night Shift Mode" class="p-2 rounded-full bg-[#E5E5EA]/70 dark:bg-[#2C2C2E]/70 text-slate-700 dark:text-zinc-200 hover:bg-[#E5E5EA] dark:hover:bg-[#2C2C2E] transition active:scale-95 border border-black/[0.04] dark:border-white/[0.06]">
+          <svg id="theme-icon-moon" class="hidden dark:block" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+          <svg id="theme-icon-sun" class="block dark:hidden" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- APPLE DYNAMIC ISLAND CLINICAL STATUS CAPSULE -->
+  <div id="dynamic-island-capsule" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 mt-3">
+    <div class="bg-black/90 dark:bg-[#1C1C1E]/95 text-white backdrop-blur-2xl rounded-2xl sm:rounded-full px-4 py-2.5 shadow-ios dark:shadow-ios-dark border border-white/10 flex flex-wrap items-center justify-between gap-2.5 text-xs">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#34C759] animate-pulse"></span>
+        <span class="font-bold tracking-tight text-[11px] sm:text-xs">OPD Live Footfall: <span id="quick-tally-total-capsule" class="font-mono text-[#30B0C7] font-extrabold text-sm ml-1">0</span></span>
+      </div>
+      <div id="wbct-mini-pill" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-[11px] font-mono font-medium">
+        <span>⏱️ 20WBCT Clotting:</span>
+        <span id="mini-wbct-timer" class="font-bold text-[#FF9500]">20:00</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-semibold text-white/80 hidden md:inline">100% Client-Side Vault</span>
+        <span class="px-2.5 py-0.5 rounded-full bg-[#007AFF] text-white font-bold text-[9px] uppercase tracking-wider">CDSCO Safe</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NON-BLOCKING 20WBCT EMERGENCY ALERT BANNER -->
+  <div id="wbct-alarm-banner" class="hidden max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 mt-3">
+    <div class="p-4 bg-[#FF3B30] text-white rounded-3xl shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-bounce">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🚨</span>
+        <div>
+          <h3 class="text-sm font-black tracking-wide">20WBCT CLOTTING TEST TIME EXPIRED!</h3>
+          <p class="text-xs text-rose-100">Invert the glass tube gently now. If blood is unclotted: systemic coagulopathy confirmed -> Administer 10 Vials Polyvalent ASV immediately.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="prefillReferralFromEmergency('snakebite')" class="px-3.5 py-1.5 bg-white text-rose-900 text-xs font-bold rounded-xl shadow-xs transition active:scale-95">Send to Referral</button>
+        <button onclick="dismissWbctAlarm()" class="px-3 py-1.5 bg-rose-900 text-rose-100 text-xs font-medium rounded-xl hover:bg-rose-950 transition active:scale-95">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CLINICAL VIEW CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8">
+
+    <!-- ========================================================= -->
+    <!-- MASTER HUB 1: OPD WORKBENCH -->
+    <!-- ========================================================= -->
+    <section id="hub-opd" class="hub-content space-y-4">
+      
+      <!-- Top Quick Tally Strip (Integrated 1-Tap IDSP Disease Steppers) -->
+      <div class="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-5 shadow-ios dark:shadow-ios-dark transition-colors">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+          <!-- Footfall Counter -->
+          <div class="flex items-center gap-3">
+            <div class="px-3.5 py-1.5 rounded-full bg-[#34C759]/10 text-[#34C759] border border-[#34C759]/20 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-[#34C759] animate-pulse"></span>
+              <span class="text-xs font-bold">Shift Footfall:</span>
+              <span id="quick-tally-total" class="text-base font-black font-mono">0</span>
+            </div>
+            <span class="text-xs text-slate-400 dark:text-zinc-500 hidden lg:inline">• 1-Tap IDSP Form P Tally Strip</span>
+          </div>
+
+          <!-- Quick Top Disease Dual Steppers (+ / -) -->
+          <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+            <!-- ARI -->
+            <div class="flex items-center gap-1.5 bg-[#F2F2F7] dark:bg-[#2C2C2E] px-2.5 py-1.5 rounded-2xl border border-black/[0.04] dark:border-white/[0.06] shrink-0">
+              <span class="text-[11px] font-semibold text-[#1C1C1E] dark:text-zinc-200">ARI</span>
+              <span id="quick-count-ari" class="font-mono text-xs font-bold text-[#007AFF] px-1 min-w-[18px] text-center">0</span>
+              <button onclick="decrementTally('ari')" title="Decrement ARI" class="w-6 h-6 rounded-xl bg-white dark:bg-[#3A3A3C] text-[#1C1C1E] dark:text-white font-mono text-xs font-bold flex items-center justify-center shadow-2xs hover:bg-slate-100 active:scale-95 transition">-</button>
+              <button onclick="incrementTally('ari', 1)" title="Increment ARI" class="w-6 h-6 rounded-xl bg-[#007AFF] text-white font-mono text-xs font-bold flex items-center justify-center shadow-2xs hover:bg-blue-600 active:scale-95 transition">+</button>
+            </div>
+
+            <!-- Diarrhea / ADD -->
+            <div class="flex items-center gap-1.5 bg-[#F2F2F7] dark:bg-[#2C2C2E] px-2.5 py-1.5 rounded-2xl border border-black/[0.04] dark:border-white/[0.06] shrink-0">
+              <span class="text-[11px] font-semibold text-[#1C1C1E] dark:text-zinc-200">Diarrhea</span>
+              <span id="quick-count-add" class="font-mono text-xs font-bold text-[#30B0C7] px-1 min-w-[18px] text-center">0</span>
+              <button onclick="decrementTally('add')" title="Decrement Diarrhea" class="w-6 h-6 rounded-xl bg-white dark:bg-[#3A3A3C] text-[#1C1C1E] dark:text-white font-mono text-xs font-bold flex items-center justify-center shadow-2xs hover:bg-slate-100 active:scale-95 transition">-</button>
+              <button onclick="incrementTally('add', 1)" title="Increment Diarrhea" class="w-6 h-6 rounded-xl bg-[#30B0C7] text-white font-mono text-xs font-bold flex items-center justify-center shadow-2xs hover:bg-cyan-600 active:scale-95 transition">+</button>
+            </div>
+
+            <!-- Fever / PUO -->
+            <div class="flex items-center gap-1.5 bg-[#F2F2F7] dark:bg-[#2C2C2E] px-2.5 py-1.5 rounded-2xl border border-black/[0.04] dark:border-white/[0.06] shrink-0">
+              <span class="text-[11px] font-semibold text-[#1C1C1E] dark:text-zinc-200">Fever</span>
+              <span id="quick-count-fuo" class="font-mono text-xs font-bold text-[#FF9500] px-1 min-w-[18px] text-center">0</span>
+              <button onclick="decrementTally('fuo')" title="Decrement Fever" class="w-6 h-6 rounded-xl bg-white dark:bg-[#3A3A3C] text-[#1C1C1E] dark:text-white font-mono text-xs font-bold flex items-center justify-center shadow-2xs hover:bg-slate-100 active:scale-95 transition">-</button>
+              <button onclick="incrementTally('fuo', 1)" title="Increment Fever" class="w-6 h-6 rounded-xl bg-[#FF9500] text-white font-mono text-xs font-bold flex items-center justify-center shadow-2xs hover:bg-amber-600 active:scale-95 transition">+</button>
+            </div>
+
+            <!-- HTN / NCD -->
+            <div class="flex items-center gap-1.5 bg-[#F2F2F7] dark:bg-[#2C2C2E] px-2.5 py-1.5 rounded-2xl border border-black/[0.04] dark:border-white/[0.06] shrink-0">
+              <span class="text-[11px] font-semibold text-[#1C1C1E] dark:text-zinc-200">HTN/DM</span>
+              <span id="quick-count-htn" class="font-mono text-xs font-bold text-[#FF3B30] px-1 min-w-[18px] text-center">0</span>
+              <button onclick="decrementTally('htn')" title="Decrement HTN" class="w-6 h-6 rounded-xl bg-white dark:bg-[#3A3A3C] text-[#1C1C1E] dark:text-white font-mono text-xs font-bold flex items-center justify-center shadow-2xs hover:bg-slate-100 active:scale-95 transition">-</button>
+              <button onclick="incrementTally('htn', 1)" title="Increment HTN" class="w-6 h-6 rounded-xl bg-[#FF3B30] text-white font-mono text-xs font-bold flex items-center justify-center shadow-2xs hover:bg-red-600 active:scale-95 transition">+</button>
+            </div>
+
+            <!-- Full Register Toggle -->
+            <button onclick="toggleTallyDrawer()" class="px-3.5 py-1.5 text-xs font-bold rounded-full bg-[#1C1C1E] dark:bg-white text-white dark:text-[#1C1C1E] hover:opacity-90 transition shrink-0 shadow-sm active:scale-95">
+              📊 Full Register
+            </button>
+          </div>
+        </div>
+
+        <!-- Collapsible Full Tally Drawer -->
+        <div id="full-tally-drawer" class="hidden mt-4 pt-4 border-t border-black/[0.06] dark:border-white/[0.08] space-y-4">
+          <div id="tally-content-container"></div>
+        </div>
+      </div>
+
+      <!-- Weight Command Instrument Card -->
+      <div class="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-ios dark:shadow-ios-dark p-4 sm:p-6 transition-colors">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/[0.06] dark:border-white/[0.08] pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-black uppercase tracking-wider text-[#007AFF]">Point-of-Care Pediatric Engine</span>
+              <span class="text-[10px] font-medium text-slate-400 dark:text-zinc-500">• NLEM & IAP Standard</span>
+            </div>
+            <h2 class="text-base sm:text-lg font-bold text-[#1C1C1E] dark:text-white mt-0.5">Pediatric Weight-Based Formulary</h2>
+          </div>
+
+          <!-- Tactile Weight Steppers -->
+          <div class="flex items-center gap-2 self-center sm:self-auto bg-[#F2F2F7] dark:bg-[#2C2C2E] p-1.5 rounded-2xl border border-black/[0.04] dark:border-white/[0.06]">
+            <button onclick="adjustWeight(-1.0)" title="-1.0 kg" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-[#3A3A3C] text-slate-700 dark:text-zinc-200 font-mono text-xs font-bold shadow-2xs active:scale-95 transition">-1k</button>
+            <button onclick="adjustWeight(-0.5)" title="-0.5 kg" class="w-9 h-9 rounded-xl bg-white dark:bg-[#3A3A3C] text-[#1C1C1E] dark:text-white font-mono text-base font-bold flex items-center justify-center shadow-2xs active:scale-95 transition">-</button>
+            
+            <div class="flex flex-col items-center px-3">
+              <span id="peds-weight-display" class="text-2xl font-black font-mono tracking-tight tabular-nums text-[#1C1C1E] dark:text-white min-w-[100px] text-center">
+                12.0 kg
+              </span>
+              <span class="text-[8px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-400">Patient Weight</span>
+            </div>
+
+            <button onclick="adjustWeight(0.5)" title="+0.5 kg" class="w-9 h-9 rounded-xl bg-white dark:bg-[#3A3A3C] text-[#1C1C1E] dark:text-white font-mono text-base font-bold flex items-center justify-center shadow-2xs active:scale-95 transition">+</button>
+            <button onclick="adjustWeight(1.0)" title="+1.0 kg" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-[#3A3A3C] text-slate-700 dark:text-zinc-200 font-mono text-xs font-bold shadow-2xs active:scale-95 transition">+1k</button>
+          </div>
+        </div>
+
+        <!-- Slider Track -->
+        <div class="mt-4">
+          <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 dark:text-zinc-400 mb-1.5">
+            <span>2.0 kg (Neonate)</span>
+            <span>12 kg (Toddler)</span>
+            <span>25 kg (Child)</span>
+            <span>50.0 kg (Adolescent)</span>
+          </div>
+          <input id="peds-weight-slider" type="range" min="2" max="50" step="0.5" value="12" class="w-full" aria-label="Adjust patient weight">
+        </div>
+
+        <!-- Age Preset Chips -->
+        <div class="mt-3.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
+          <span class="text-[11px] font-bold text-slate-400 dark:text-zinc-400 shrink-0 mr-1">Presets:</span>
+          <button onclick="setWeight(3.5)" class="px-3 py-1 text-xs font-semibold bg-[#F2F2F7] dark:bg-[#2C2C2E] hover:bg-slate-200 dark:hover:bg-[#3A3A3C] text-[#1C1C1E] dark:text-zinc-200 rounded-full transition shrink-0 active:scale-95">Newborn (3.5kg)</button>
+          <button onclick="setWeight(5)" class="px-3 py-1 text-xs font-semibold bg-[#F2F2F7] dark:bg-[#2C2C2E] hover:bg-slate-200 dark:hover:bg-[#3A3A3C] text-[#1C1C1E] dark:text-zinc-200 rounded-full transition shrink-0 active:scale-95">3 Mo (5kg)</button>
+          <button onclick="setWeight(7)" class="px-3 py-1 text-xs font-semibold bg-[#F2F2F7] dark:bg-[#2C2C2E] hover:bg-slate-200 dark:hover:bg-[#3A3A3C] text-[#1C1C1E] dark:text-zinc-200 rounded-full transition shrink-0 active:scale-95">6 Mo (7kg)</button>
+          <button onclick="setWeight(10)" class="px-3 py-1 text-xs font-semibold bg-[#F2F2F7] dark:bg-[#2C2C2E] hover:bg-slate-200 dark:hover:bg-[#3A3A3C] text-[#1C1C1E] dark:text-zinc-200 rounded-full transition shrink-0 active:scale-95">1 Yr (10kg)</button>
+          <button onclick="setWeight(12)" class="px-3 py-1 text-xs font-semibold bg-[#F2F2F7] dark:bg-[#2C2C2E] hover:bg-slate-200 dark:hover:bg-[#3A3A3C] text-[#1C1C1E] dark:text-zinc-200 rounded-full transition shrink-0 active:scale-95">2 Yr (12kg)</button>
+          <button onclick="setWeight(18)" class="px-3 py-1 text-xs font-semibold bg-[#F2F2F7] dark:bg-[#2C2C2E] hover:bg-slate-200 dark:hover:bg-[#3A3A3C] text-[#1C1C1E] dark:text-zinc-200 rounded-full transition shrink-0 active:scale-95">5 Yr (18kg)</button>
+          <button onclick="setWeight(25)" class="px-3 py-1 text-xs font-semibold bg-[#F2F2F7] dark:bg-[#2C2C2E] hover:bg-slate-200 dark:hover:bg-[#3A3A3C] text-[#1C1C1E] dark:text-zinc-200 rounded-full transition shrink-0 active:scale-95">8 Yr (25kg)</button>
+          <button onclick="setWeight(35)" class="px-3 py-1 text-xs font-semibold bg-[#F2F2F7] dark:bg-[#2C2C2E] hover:bg-slate-200 dark:hover:bg-[#3A3A3C] text-[#1C1C1E] dark:text-zinc-200 rounded-full transition shrink-0 active:scale-95">12 Yr (35kg)</button>
+        </div>
+      </div>
+
+      <!-- Action Bar: In-Page Search, View Switcher & Category Chips -->
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        
+        <!-- Left: Search Input -->
+        <div class="relative flex-1 max-w-xs">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="peds-desk-search-input" type="text" placeholder="Filter generic drug..." oninput="handlePedsSearch(this.value)" class="w-full pl-9 pr-8 py-2 text-xs rounded-full bg-white dark:bg-[#1C1C1E] border border-black/[0.06] dark:border-white/[0.08] text-[#1C1C1E] dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20 shadow-2xs">
+          <button id="peds-search-clear-btn" onclick="clearPedsSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-zinc-200 text-xs font-bold" title="Clear Search">✕</button>
+        </div>
+
+        <!-- Right: View Mode & Category Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- View Switcher (Matrix vs Cards vs PALS Tape) -->
+          <div class="flex items-center bg-[#E5E5EA] dark:bg-[#2C2C2E] p-1 rounded-full border border-black/[0.04] dark:border-white/[0.06] shrink-0">
+            <button id="btn-view-matrix" onclick="setPedsViewMode('matrix')" class="px-3.5 py-1.5 text-xs font-bold rounded-full bg-white dark:bg-[#1C1C1E] text-[#1C1C1E] dark:text-white shadow-sm transition shrink-0 active:scale-95">
+              ⚡ Matrix Table
+            </button>
+            <button id="btn-view-cards" onclick="setPedsViewMode('cards')" class="px-3.5 py-1.5 text-xs font-bold rounded-full text-slate-500 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white transition shrink-0 active:scale-95">
+              📋 Drug Cards
+            </button>
+            <button id="btn-view-pals" onclick="setPedsViewMode('pals')" class="px-3.5 py-1.5 text-xs font-bold rounded-full text-[#FF3B30] hover:bg-[#FF3B30]/10 transition shrink-0 active:scale-95">
+              👶 PALS Resus Tape
+            </button>
+          </div>
+
+          <!-- Category Chips -->
+          <div id="peds-category-chips-bar" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <button id="peds-cat-All" onclick="setPedsCategory('All')" class="peds-cat-btn px-3 py-1 text-xs font-semibold rounded-full bg-[#1C1C1E] dark:bg-white text-white dark:text-[#1C1C1E] transition shrink-0 active:scale-95">All</button>
+            <button id="peds-cat-AntipyreticsAnalgesics" onclick="setPedsCategory('Antipyretics / Analgesics')" class="peds-cat-btn px-3 py-1 text-xs font-semibold rounded-full bg-white dark:bg-[#1C1C1E] text-slate-600 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white border border-black/[0.06] dark:border-white/[0.08] transition shrink-0 active:scale-95">Antipyretics</button>
+            <button id="peds-cat-Antibiotics" onclick="setPedsCategory('Antibiotics')" class="peds-cat-btn px-3 py-1 text-xs font-semibold rounded-full bg-white dark:bg-[#1C1C1E] text-slate-600 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white border border-black/[0.06] dark:border-white/[0.08] transition shrink-0 active:scale-95">Antibiotics</button>
+            <button id="peds-cat-AntiemeticsGI" onclick="setPedsCategory('Antiemetics / GI')" class="peds-cat-btn px-3 py-1 text-xs font-semibold rounded-full bg-white dark:bg-[#1C1C1E] text-slate-600 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white border border-black/[0.06] dark:border-white/[0.08] transition shrink-0 active:scale-95">GI / ORS</button>
+            <button id="peds-cat-RespiratoryAntiallergic" onclick="setPedsCategory('Respiratory / Antiallergic')" class="peds-cat-btn px-3 py-1 text-xs font-semibold rounded-full bg-white dark:bg-[#1C1C1E] text-slate-600 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white border border-black/[0.06] dark:border-white/[0.08] transition shrink-0 active:scale-95">Respiratory</button>
+            <button id="peds-cat-EmergencyAnticonvulsant" onclick="setPedsCategory('Emergency & Anticonvulsant')" class="peds-cat-btn px-3 py-1 text-xs font-semibold rounded-full bg-white dark:bg-[#1C1C1E] text-slate-600 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white border border-black/[0.06] dark:border-white/[0.08] transition shrink-0 active:scale-95">Emergency/Seizure</button>
+            <button id="peds-cat-GovtProgramsVitamins" onclick="setPedsCategory('Govt Programs & Vitamins')" class="peds-cat-btn px-3 py-1 text-xs font-semibold rounded-full bg-white dark:bg-[#1C1C1E] text-slate-600 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white border border-black/[0.06] dark:border-white/[0.08] transition shrink-0 active:scale-95">Govt / Vitamins</button>
+            <button id="peds-cat-DermatologyTopicals" onclick="setPedsCategory('Dermatology & Topicals')" class="peds-cat-btn px-3 py-1 text-xs font-semibold rounded-full bg-white dark:bg-[#1C1C1E] text-slate-600 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white border border-black/[0.06] dark:border-white/[0.08] transition shrink-0 active:scale-95">Topicals / Skin</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Dynamic Content (Matrix Table, Cards, or PALS Tape) -->
+      <div id="pediatric-content-container"></div>
+
+      <!-- Collapsible National Health Programs Accordion -->
+      <div class="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-5 shadow-ios dark:shadow-ios-dark transition-colors">
+        <button onclick="toggleProgramsAccordion()" class="w-full flex items-center justify-between text-left active:scale-[0.99] transition">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#34C759]"></span>
+            <span class="text-xs sm:text-sm font-bold text-[#1C1C1E] dark:text-white">National Health Programs (TB NIKSHAY • Malaria NVBDCP • NACO STI Kits)</span>
+          </div>
+          <span id="programs-toggle-arrow" class="text-xs text-slate-400 dark:text-zinc-400 transition-transform">▼</span>
+        </button>
+        <div id="programs-collapsible-drawer" class="hidden mt-4 pt-4 border-t border-black/[0.06] dark:border-white/[0.08]">
+          <div id="national-programs-container" class="space-y-4"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- MASTER HUB 2: CASUALTY & RESUS COMMAND -->
+    <!-- ========================================================= -->
+    <section id="hub-emergency" class="hub-content hidden space-y-4">
+      
+      <!-- Sub-Pill Segmented Selector -->
+      <div class="bg-[#E5E5EA] dark:bg-[#2C2C2E] p-1.5 rounded-full border border-black/[0.04] dark:border-white/[0.06] flex items-center gap-1 overflow-x-auto no-scrollbar shadow-xs">
+        <button id="btn-em-sub-resus" onclick="switchEmergencySubTab('resus')" class="em-sub-btn active-em-sub px-4 py-2 rounded-full text-xs font-bold bg-white dark:bg-[#1C1C1E] text-[#1C1C1E] dark:text-white shadow-sm transition shrink-0 active:scale-95">
+          🚨 ICMR Resus Protocols
+        </button>
+        <button id="btn-em-sub-ecg" onclick="switchEmergencySubTab('ecg')" class="em-sub-btn px-4 py-2 rounded-full text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white transition shrink-0 active:scale-95">
+          🫀 10s ECG & STEMI
+        </button>
+        <button id="btn-em-sub-tox" onclick="switchEmergencySubTab('tox')" class="em-sub-btn px-4 py-2 rounded-full text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white transition shrink-0 active:scale-95">
+          ☠️ Toxidromes & Antidotes
+        </button>
+        <button id="btn-em-sub-vaso" onclick="switchEmergencySubTab('vaso')" class="em-sub-btn px-4 py-2 rounded-full text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white transition shrink-0 active:scale-95">
+          💉 Vasopressors & DDI
+        </button>
+      </div>
+
+      <!-- SUB-VIEW 1: ICMR RESUS PROTOCOLS -->
+      <div id="em-view-resus" class="em-sub-view space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6">
+          <div class="md:col-span-1 space-y-2">
+            <h3 class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 dark:text-zinc-400 px-1">ICMR Resus Protocols</h3>
+            <div id="emergency-nav-container" class="space-y-1.5 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl p-2 rounded-3xl border border-black/[0.06] dark:border-white/[0.08] shadow-ios dark:shadow-ios-dark"></div>
+          </div>
+          <div id="emergency-detail-container" class="md:col-span-3"></div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW 2: 10s ECG & STEMI -->
+      <div id="em-view-ecg" class="em-sub-view hidden space-y-4">
+        <div class="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-5 sm:p-6 shadow-ios dark:shadow-ios-dark">
+          <div class="border-b border-black/[0.06] dark:border-white/[0.08] pb-3.5 mb-4">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-[#FF3B30]">Casualty STEMI Command</span>
+            <h2 class="text-base sm:text-lg font-bold text-[#1C1C1E] dark:text-white">10-Second ECG Diagnostic & Thrombolysis Checklist</h2>
+            <p class="text-xs text-slate-500 dark:text-zinc-400">Territory localization, culprit vessels, and pre-thrombolysis absolute contraindication verification.</p>
+          </div>
+          <div id="ecg-content-container" class="space-y-6"></div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW 3: TOXICOLOGY & ANTIDOTES -->
+      <div id="em-view-tox" class="em-sub-view hidden space-y-4">
+        <div class="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-5 sm:p-6 shadow-ios dark:shadow-ios-dark">
+          <div class="border-b border-black/[0.06] dark:border-white/[0.08] pb-3.5 mb-4">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-[#FF9500]">Emergency Toxicology</span>
+            <h2 class="text-base sm:text-lg font-bold text-[#1C1C1E] dark:text-white">Casualty Poisoning Protocols & Critical Antidotes</h2>
+            <p class="text-xs text-slate-500 dark:text-zinc-400">Indian poisoning guidelines for Celphos (Aluminum Phosphide), Kerosene, Paracetamol, Rodenticides, Corrosives, and Dhatura.</p>
+          </div>
+          <div id="toxicology-content-container" class="space-y-4"></div>
+        </div>
+      </div>
+
+      <!-- SUB-VIEW 4: VASOPRESSORS & DDI MATRIX -->
+      <div id="em-view-vaso" class="em-sub-view hidden space-y-4">
+        <div class="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-5 sm:p-6 shadow-ios dark:shadow-ios-dark">
+          <div class="border-b border-black/[0.06] dark:border-white/[0.08] pb-3.5 mb-4">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-[#007AFF]">ICU & Casualty Support</span>
+            <h2 class="text-base sm:text-lg font-bold text-[#1C1C1E] dark:text-white">Emergency Vasopressor Infusion Calculator & DDI Shield</h2>
+            <p class="text-xs text-slate-500 dark:text-zinc-400">Precise mL/hr syringe pump infusion rates and fatal point-of-care drug contraindications.</p>
+          </div>
+          <div id="vasopressors-content-container" class="space-y-6"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- MASTER HUB 3: FORENSIC & REFERRAL SHIELD -->
+    <!-- ========================================================= -->
+    <section id="hub-legal" class="hub-content hidden space-y-4">
+      
+      <!-- Sub-Pill Mode Switcher -->
+      <div class="bg-[#E5E5EA] dark:bg-[#2C2C2E] p-1.5 rounded-full border border-black/[0.04] dark:border-white/[0.06] flex items-center gap-1 overflow-x-auto no-scrollbar shadow-xs">
+        <button id="btn-legal-sub-referral" onclick="switchLegalSubTab('referral')" class="legal-sub-btn active-legal-sub px-4 py-2 rounded-full text-xs font-bold bg-white dark:bg-[#1C1C1E] text-[#1C1C1E] dark:text-white shadow-sm transition shrink-0 active:scale-95">
+          🚑 Emergency Pre-Referral Slip
+        </button>
+        <button id="btn-legal-sub-mlc" onclick="switchLegalSubTab('mlc')" class="legal-sub-btn px-4 py-2 rounded-full text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white transition shrink-0 active:scale-95">
+          ⚖️ Medico-Legal Injury (BNS 116)
+        </button>
+        <button id="btn-legal-sub-transformer" onclick="switchLegalSubTab('transformer')" class="legal-sub-btn px-4 py-2 rounded-full text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white transition shrink-0 active:scale-95">
+          📄 Clinical Document Transformer
+        </button>
+        <button id="btn-legal-sub-autopsy" onclick="switchLegalSubTab('autopsy')" class="legal-sub-btn px-4 py-2 rounded-full text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white transition shrink-0 active:scale-95">
+          🔍 Post-Mortem & Sobriety
+        </button>
+      </div>
+
+      <!-- MOBILE DUAL-PANE VIEW SWITCHER (Visible on < 1024px) -->
+      <div class="lg:hidden flex items-center justify-between bg-[#E5E5EA] dark:bg-[#2C2C2E] p-1 rounded-full border border-black/[0.04] dark:border-white/[0.06]">
+        <button id="btn-hub3-mobile-form" onclick="switchHub3MobileView('form')" class="flex-1 py-2 px-3 rounded-full text-xs font-bold bg-white dark:bg-[#1C1C1E] text-[#1C1C1E] dark:text-white shadow-sm transition active:scale-95">
+          📝 Editor & Inputs
+        </button>
+        <button id="btn-hub3-mobile-preview" onclick="switchHub3MobileView('preview')" class="flex-1 py-2 px-3 rounded-full text-xs font-bold text-slate-500 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white transition flex items-center justify-center gap-1.5 active:scale-95">
+          <span>📄 Generated Document</span>
+          <span id="hub3-mobile-preview-badge" class="w-2 h-2 rounded-full bg-[#34C759]"></span>
+        </button>
+      </div>
+
+      <!-- DUAL PANE WORKBENCH -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+        
+        <!-- Left Pane: Input Form & Document Transformer -->
+        <div id="hub3-left-pane" class="block lg:col-span-6 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-6 shadow-ios dark:shadow-ios-dark space-y-4">
+          
+          <!-- SUB-FORM 1: REFERRAL INPUTS -->
+          <div id="legal-form-referral" class="space-y-4">
+            <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
+              <div>
+                <h3 class="text-sm font-bold text-[#1C1C1E] dark:text-white">Emergency Pre-Referral Form</h3>
+                <p class="text-[11px] text-slate-500 dark:text-zinc-400">Statutory summary with attendant informed consent disclosure.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="clearReferralForm()" class="px-2.5 py-1 bg-[#F2F2F7] dark:bg-[#2C2C2E] text-slate-700 dark:text-zinc-300 text-[10px] font-bold rounded-full border border-black/[0.04] dark:border-white/[0.06] hover:bg-slate-200 dark:hover:bg-[#3A3A3C] active:scale-95 transition" title="Clear all fields for new patient">
+                  ⟲ New Patient
+                </button>
+                <button onclick="applyVitalsPreset('shock')" class="px-2.5 py-1 bg-[#FF3B30]/10 text-[#FF3B30] text-[10px] font-bold rounded-full border border-[#FF3B30]/20 hover:bg-[#FF3B30]/20 active:scale-95 transition">
+                  ⚡ Shock Preset
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">Patient Name</label>
+                <input id="ref-input-ptname" type="text" value="Patient X" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20 focus:border-[#007AFF]">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">Age / Sex</label>
+                <input id="ref-input-agesex" type="text" value="28 / M" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20 focus:border-[#007AFF]">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">Referring Facility</label>
+                <input id="ref-input-facility" type="text" value="Primary Health Centre, Rural Block" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20 focus:border-[#007AFF]">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">Medical Officer</label>
+                <input id="ref-input-doctor" type="text" value="Dr. Medical Officer, MBBS" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20 focus:border-[#007AFF]">
+              </div>
+            </div>
+
+            <!-- Vitals -->
+            <div class="border-t border-black/[0.06] dark:border-white/[0.08] pt-3">
+              <label class="block font-bold text-xs text-[#1C1C1E] dark:text-white mb-2">Presentation Vitals</label>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 text-xs">
+                <div>
+                  <span class="text-[10px] text-slate-400 dark:text-zinc-400 font-semibold">BP (mmHg)</span>
+                  <input id="ref-input-bp" type="text" value="120/80" class="w-full p-2 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl font-mono text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-400 dark:text-zinc-400 font-semibold">Pulse (bpm)</span>
+                  <input id="ref-input-pr" type="text" value="84" class="w-full p-2 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl font-mono text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-400 dark:text-zinc-400 font-semibold">SpO2 (%)</span>
+                  <input id="ref-input-spo2" type="text" value="98" class="w-full p-2 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl font-mono text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-400 dark:text-zinc-400 font-semibold">Blood Sugar</span>
+                  <input id="ref-input-rbs" type="text" value="110" class="w-full p-2 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl font-mono text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+                </div>
+                <div>
+                  <span class="text-[10px] text-slate-400 dark:text-zinc-400 font-semibold">GCS Score</span>
+                  <input id="ref-input-gcs" type="text" value="15/15" class="w-full p-2 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl font-mono text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-3 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">Provisional Diagnosis</label>
+                <input id="ref-input-diag" type="text" value="Acute Neurotoxic Snakebite (Suspected Krait bite)" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">Emergency Drugs Administered</label>
+                <textarea id="ref-input-drugs" rows="2" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl text-xs font-mono dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">10 Vials Polyvalent ASV in 500 mL NS IV, Inj. Atropine 0.6mg + Neostigmine 1.5mg IV given at 10:45 AM</textarea>
+              </div>
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">Reason for Referral</label>
+                <input id="ref-input-reason" type="text" value="Requires higher tertiary care monitoring / Ventilator standby" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 rounded-xl text-xs dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+              </div>
+            </div>
+
+            <!-- Action Bar at bottom of Referral Form -->
+            <div class="pt-4 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <button type="button" onclick="switchHub3MobileView('preview')" class="flex-1 py-3 px-4 bg-[#007AFF] hover:bg-blue-600 text-white text-xs font-bold rounded-2xl shadow-sm flex items-center justify-center gap-2 active:scale-95 transition">
+                <span>📄 View / Print Generated Referral Slip</span>
+                <span>→</span>
+              </button>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="shareActiveLegalSlip()" class="flex-1 sm:flex-none px-4 py-3 bg-[#34C759] hover:bg-emerald-600 text-white text-xs font-semibold rounded-2xl transition flex items-center justify-center gap-1.5 shadow-2xs active:scale-95">
+                  <span>📲 WhatsApp</span>
+                </button>
+                <button type="button" onclick="printActiveLegalSlip()" class="px-4 py-3 bg-[#1C1C1E] dark:bg-white text-white dark:text-[#1C1C1E] text-xs font-semibold rounded-2xl transition shadow-2xs active:scale-95">
+                  🖨️ Print
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-FORM 2: MEDICO-LEGAL INJURY (BNS 116) -->
+          <div id="legal-form-mlc" class="hidden space-y-4">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-[#FF9500]">Forensic Documentation</span>
+              <h3 class="text-sm font-bold text-[#1C1C1E] dark:text-white">Injury Classification (BNS 114–116 / IPC 320)</h3>
+            </div>
+
+            <div class="space-y-3 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">1. Type of Wound / Injury</label>
+                <select id="mlc-input-type" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 text-[#1C1C1E] dark:text-white rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+                  <option value="Lacerated Wound">Lacerated Wound (Blunt Force)</option>
+                  <option value="Incised Wound">Incised Wound (Sharp Force / Cutting)</option>
+                  <option value="Chop Wound">Chop Wound (Heavy Sharp Weapon)</option>
+                  <option value="Contusion (Bruise)">Contusion / Bruise (Blunt Impact)</option>
+                  <option value="Abrasion">Abrasion (Frictional Surface Impact)</option>
+                  <option value="Stab / Punctured Wound">Stab / Punctured Wound (Pointed Weapon)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">2. Anatomical Location & Landmarks</label>
+                <input id="mlc-input-location" type="text" value="Forehead, 3 cm above left eyebrow" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 text-[#1C1C1E] dark:text-white rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+              </div>
+
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">Length (cm)</label>
+                  <input id="mlc-input-length" type="text" value="4.0" class="w-full p-2 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 text-[#1C1C1E] dark:text-white rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">Breadth (cm)</label>
+                  <input id="mlc-input-breadth" type="text" value="1.5" class="w-full p-2 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 text-[#1C1C1E] dark:text-white rounded-xl text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">Depth</label>
+                  <input id="mlc-input-depth" type="text" value="Bone deep" class="w-full p-2 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 text-[#1C1C1E] dark:text-white rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+                </div>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">3. Margins & Morphology</label>
+                <input id="mlc-input-margins" type="text" value="Irregular, contused, tissue bridging present across base" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 text-[#1C1C1E] dark:text-white rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">4. Estimated Age</label>
+                  <input id="mlc-input-age" type="text" value="Fresh (< 6 hours duration)" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 text-[#1C1C1E] dark:text-white rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-700 dark:text-zinc-300 mb-1">5. Weapon Nature</label>
+                  <input id="mlc-input-weapon" type="text" value="Hard and blunt object" class="w-full p-2.5 border border-black/[0.08] dark:border-white/[0.12] bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 text-[#1C1C1E] dark:text-white rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20">
+                </div>
+              </div>
+            </div>
+
+            <!-- Grievous Hurt Checklist -->
+            <div class="border-t border-black/[0.06] dark:border-white/[0.08] pt-3">
+              <div class="flex items-center justify-between mb-2">
+                <label class="block font-bold text-xs text-[#1C1C1E] dark:text-white">Grievous Hurt Checklist:</label>
+                <span class="text-[9px] font-mono text-[#FF9500] bg-[#FF9500]/10 px-2 py-0.5 rounded-full border border-[#FF9500]/20 font-bold">Sec 116 BNS / 320 IPC</span>
+              </div>
+              <div id="grievous-clauses-container" class="space-y-1.5 max-h-40 overflow-y-auto pr-1"></div>
+            </div>
+
+            <!-- Action Bar at bottom of MLC Form -->
+            <div class="pt-4 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <button type="button" onclick="switchHub3MobileView('preview')" class="flex-1 py-3 px-4 bg-[#FF9500] hover:bg-amber-600 text-white text-xs font-bold rounded-2xl shadow-sm flex items-center justify-center gap-2 active:scale-95 transition">
+                <span>⚖️ View / Print Medico-Legal Injury Certificate</span>
+                <span>→</span>
+              </button>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="shareActiveLegalSlip()" class="flex-1 sm:flex-none px-4 py-3 bg-[#34C759] hover:bg-emerald-600 text-white text-xs font-semibold rounded-2xl transition flex items-center justify-center gap-1.5 shadow-2xs active:scale-95">
+                  <span>📲 WhatsApp</span>
+                </button>
+                <button type="button" onclick="printActiveLegalSlip()" class="px-4 py-3 bg-[#1C1C1E] dark:bg-white text-white dark:text-[#1C1C1E] text-xs font-semibold rounded-2xl transition shadow-2xs active:scale-95">
+                  🖨️ Print
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-FORM 3: CLINICAL DOCUMENT & SHIFT TRANSFORMER -->
+          <div id="legal-form-transformer" class="hidden space-y-4">
+            <div class="flex items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-[#5856D6]">Document Processing Engine</span>
+                <h3 class="text-sm font-bold text-[#1C1C1E] dark:text-white">Messy Clinical Document Transformer</h3>
+                <p class="text-[11px] text-slate-500 dark:text-zinc-400">Turns messy doctor shorthand, triage dictations, WhatsApp handovers & CSV/JSON logs into clean statutory stationery in seconds.</p>
+              </div>
+              <div class="flex items-center gap-1 shrink-0">
+                <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-[#34C759]/10 text-[#34C759] border border-[#34C759]/20 font-bold">100% Client-Side</span>
+              </div>
+            </div>
+
+            <!-- DUAL INPUT MODE SELECTOR -->
+            <div class="bg-[#E5E5EA] dark:bg-[#2C2C2E] p-1 rounded-full border border-black/[0.04] dark:border-white/[0.06] flex items-center gap-1">
+              <button id="btn-trans-mode-paste" onclick="setTransformerInputMode('paste')" class="flex-1 py-1.5 px-3 rounded-full text-xs font-bold bg-white dark:bg-[#1C1C1E] text-[#1C1C1E] dark:text-white shadow-sm transition active:scale-95">
+                📝 Paste Note / WhatsApp / Shorthand
+              </button>
+              <button id="btn-trans-mode-file" onclick="setTransformerInputMode('file')" class="flex-1 py-1.5 px-3 rounded-full text-xs font-semibold text-slate-500 dark:text-zinc-400 hover:text-[#1C1C1E] dark:hover:text-white transition active:scale-95">
+                📁 Upload File (.txt, .json, .csv)
+              </button>
+            </div>
+
+            <!-- MODE 1: DIRECT RAW TEXTAREA FOR MESSY SHORTHAND / WHATSAPP -->
+            <div id="trans-paste-section" class="space-y-3">
+              <div class="relative">
+                <textarea id="doc-raw-textarea" oninput="handleRawTextareaInput(this.value)" rows="6" placeholder="Paste unformatted clinical shorthand, casualty triage dictation, WhatsApp handover message, or nursing notes here...
+
+Example:
+45/M RTA 2h back brought by 108. Severe head injury + blunt abd trauma. GCS 8/15 (E2V2M4), BP 80/50, PR 128 bpm, SpO2 91%, RBS 184. Rx: 2x 18G lines, NS 1L bolus fast, Inj Pantop 40 IV, Inj Tranexa 1g IV, C-collar applied. Splint right leg for open tibia #. Shift urgently to tertiary neurosurgery and general surgery." class="w-full p-3 bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 border border-black/[0.08] dark:border-white/[0.12] rounded-2xl font-mono text-xs text-[#1C1C1E] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#007AFF]/20 focus:border-[#007AFF] leading-relaxed placeholder:text-slate-400 dark:placeholder:text-zinc-500"></textarea>
+                <div class="flex items-center justify-between text-[10px] text-slate-400 dark:text-zinc-400 mt-1 px-1">
+                  <span>Auto-detects vitals (BP, PR, SpO2, RBS, GCS), medications, shock index & BNS 116 flags</span>
+                  <span id="doc-raw-char-count" class="font-mono">0 chars</span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button onclick="transformRawText()" class="flex-1 py-3 px-4 bg-[#007AFF] hover:bg-blue-600 text-white font-bold rounded-2xl shadow-sm text-xs transition active:scale-95 flex items-center justify-center gap-2">
+                  <span>⚡ Transform into Clean Stationery in Seconds</span>
+                </button>
+                <button onclick="document.getElementById('doc-raw-textarea').value=''; handleRawTextareaInput('');" class="px-3.5 py-3 bg-[#F2F2F7] dark:bg-[#2C2C2E] text-slate-600 dark:text-zinc-300 hover:text-[#FF3B30] text-xs font-semibold rounded-2xl border border-black/[0.04] dark:border-white/[0.06] transition active:scale-95" title="Clear text">
+                  Clear
+                </button>
+              </div>
+            </div>
+
+            <!-- MODE 2: DRAG & DROP FILE ZONE -->
+            <div id="trans-file-section" class="hidden space-y-3">
+              <div id="doc-dropzone" ondragover="handleDocDragOver(event)" ondragleave="handleDocDragLeave(event)" ondrop="handleDocDrop(event)" onclick="document.getElementById('doc-file-input').click()" class="border-2 border-dashed border-slate-300 dark:border-zinc-700 hover:border-[#007AFF] dark:hover:border-[#007AFF] rounded-3xl p-6 text-center cursor-pointer transition bg-[#F2F2F7]/50 dark:bg-[#2C2C2E]/50 group">
+                <input id="doc-file-input" type="file" accept=".txt,.json,.csv,.md" onchange="handleDocFileSelect(event)" class="hidden">
+                <div class="flex flex-col items-center justify-center gap-2">
+                  <div class="w-12 h-12 rounded-2xl bg-[#007AFF]/10 text-[#007AFF] flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                    📄
+                  </div>
+                  <div>
+                    <p class="text-xs font-bold text-[#1C1C1E] dark:text-white">Drag & Drop clinical notes or shift files here</p>
+                    <p class="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">Supports <span class="font-mono text-[#007AFF] font-semibold">.TXT, .JSON, .CSV, .MD</span> (Max 5.0 MB)</p>
+                  </div>
+                  <button type="button" class="mt-1 px-3.5 py-1.5 bg-white dark:bg-[#1C1C1E] border border-black/[0.06] dark:border-white/[0.08] rounded-full text-xs font-semibold text-slate-700 dark:text-zinc-300 shadow-2xs hover:bg-slate-50 transition active:scale-95">
+                    Browse File
+                  </button>
+                </div>
+              </div>
+
+              <!-- Active File Info / Status Banner -->
+              <div id="doc-file-info" class="hidden p-3 bg-[#F2F2F7] dark:bg-[#2C2C2E] rounded-2xl border border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2.5 overflow-hidden">
+                  <span class="text-lg">📋</span>
+                  <div class="overflow-hidden">
+                    <span id="doc-file-name" class="font-bold text-[#1C1C1E] dark:text-white truncate block">clinical_note.txt</span>
+                    <span id="doc-file-meta" class="text-[10px] text-slate-400 font-mono">14.2 KB • UTF-8 Text</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <button onclick="startDocumentTransformation()" id="doc-btn-transform" class="px-3.5 py-1.5 bg-[#007AFF] hover:bg-blue-600 text-white font-bold rounded-full shadow-2xs text-xs transition active:scale-95">
+                    ⚡ Transform Now
+                  </button>
+                  <button onclick="clearUploadedDoc()" class="p-1.5 text-slate-400 hover:text-[#FF3B30] rounded-full transition active:scale-95" title="Remove File">
+                    ✕
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Processing Pipeline Progress Indicator -->
+            <div id="doc-processing-pipeline" class="hidden p-4 bg-[#F2F2F7] dark:bg-[#2C2C2E] rounded-3xl border border-black/[0.04] dark:border-white/[0.06] space-y-3">
+              <div class="flex items-center justify-between text-xs">
+                <span id="doc-pipeline-status-text" class="font-bold text-[#007AFF]">Validating Document Structure...</span>
+                <span id="doc-pipeline-pct" class="font-mono font-bold text-slate-500 dark:text-zinc-400">25%</span>
+              </div>
+              <div class="w-full bg-[#E5E5EA] dark:bg-[#3A3A3C] h-2 rounded-full overflow-hidden">
+                <div id="doc-pipeline-bar" class="bg-[#007AFF] h-full rounded-full transition-all duration-300" style="width: 25%"></div>
+              </div>
+              <div class="grid grid-cols-4 gap-1 text-[9px] font-mono text-center text-slate-400">
+                <span id="stage-step-1" class="text-[#007AFF] font-bold">1. Validate</span>
+                <span id="stage-step-2">2. Parse Vitals</span>
+                <span id="stage-step-3">3. BNS Structure</span>
+                <span id="stage-step-4">4. Stationery</span>
+              </div>
+            </div>
+
+            <!-- Actionable Error Alert Box (Hidden by default) -->
+            <div id="doc-error-alert" class="hidden p-4 bg-[#FF3B30]/10 border border-[#FF3B30]/30 rounded-2xl text-xs text-[#FF3B30] space-y-2">
+              <div class="flex items-start gap-2">
+                <span class="text-base">⚠️</span>
+                <div>
+                  <h4 id="doc-error-title" class="font-bold">Document Parsing Failure</h4>
+                  <p id="doc-error-reason" class="text-[11px] text-red-600 dark:text-red-400 mt-0.5">The provided file is empty or formatted in an unreadable encoding.</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 pt-1 border-t border-[#FF3B30]/20 text-[11px]">
+                <span class="font-bold">Recommended Next Step:</span>
+                <button onclick="loadSampleDoc('snakebite')" class="underline font-medium hover:opacity-80">Load Snakebite Sample</button>
+                <span>or</span>
+                <button onclick="loadSampleDoc('rta_trauma')" class="underline font-medium hover:opacity-80">Load Trauma Sample</button>
+              </div>
+            </div>
+
+            <!-- STRUCTURED CLINICAL ENTITIES REVIEW CONTAINER -->
+            <div id="doc-extracted-entities-container" class="hidden"></div>
+
+            <!-- 1-Click Loadable Sample Clinical Files -->
+            <div>
+              <label class="block font-bold text-xs text-slate-700 dark:text-zinc-300 mb-1.5">Load Verified Clinical Scenarios (1-Click Real World):</label>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
+                <button onclick="loadSampleDoc('snakebite')" class="p-2.5 rounded-2xl bg-[#F2F2F7] dark:bg-[#2C2C2E] border border-black/[0.04] dark:border-white/[0.06] hover:border-[#007AFF] text-left transition active:scale-95">
+                  <span class="text-[10px] font-bold text-[#FF3B30] block">🚨 WhatsApp</span>
+                  <span class="font-medium text-[#1C1C1E] dark:text-white truncate block">Snakebite Envenomation</span>
+                </button>
+                <button onclick="loadSampleDoc('rta_trauma')" class="p-2.5 rounded-2xl bg-[#F2F2F7] dark:bg-[#2C2C2E] border border-black/[0.04] dark:border-white/[0.06] hover:border-[#007AFF] text-left transition active:scale-95">
+                  <span class="text-[10px] font-bold text-[#FF9500] block">⚖️ Shorthand</span>
+                  <span class="font-medium text-[#1C1C1E] dark:text-white truncate block">Polytrauma & GCS Drop</span>
+                </button>
+                <button onclick="loadSampleDoc('peds_shock')" class="p-2.5 rounded-2xl bg-[#F2F2F7] dark:bg-[#2C2C2E] border border-black/[0.04] dark:border-white/[0.06] hover:border-[#007AFF] text-left transition active:scale-95">
+                  <span class="text-[10px] font-bold text-[#30B0C7] block">👶 Peds Shock</span>
+                  <span class="font-medium text-[#1C1C1E] dark:text-white truncate block">Dehydration & Diarrhea</span>
+                </button>
+                <button onclick="loadSampleDoc('celphos_poisoning')" class="p-2.5 rounded-2xl bg-[#F2F2F7] dark:bg-[#2C2C2E] border border-black/[0.04] dark:border-white/[0.06] hover:border-[#007AFF] text-left transition active:scale-95">
+                  <span class="text-[10px] font-bold text-[#5856D6] block">☠️ Toxicology</span>
+                  <span class="font-medium text-[#1C1C1E] dark:text-white truncate block">Celphos Poisoning</span>
+                </button>
+                <button onclick="loadSampleDoc('stemi_cardiogenic')" class="p-2.5 rounded-2xl bg-[#F2F2F7] dark:bg-[#2C2C2E] border border-black/[0.04] dark:border-white/[0.06] hover:border-[#007AFF] text-left transition active:scale-95">
+                  <span class="text-[10px] font-bold text-[#FF3B30] block">🫀 STEMI</span>
+                  <span class="font-medium text-[#1C1C1E] dark:text-white truncate block">Inferior MI & Shock</span>
+                </button>
+                <button onclick="loadSampleDoc('idsp_tally')" class="p-2.5 rounded-2xl bg-[#F2F2F7] dark:bg-[#2C2C2E] border border-black/[0.04] dark:border-white/[0.06] hover:border-[#007AFF] text-left transition active:scale-95">
+                  <span class="text-[10px] font-bold text-[#34C759] block">📊 Surveillance</span>
+                  <span class="font-medium text-[#1C1C1E] dark:text-white truncate block">IDSP Shift CSV</span>
+                </button>
+                <button onclick="loadSampleDoc('shift_handover')" class="p-2.5 rounded-2xl bg-[#F2F2F7] dark:bg-[#2C2C2E] border border-black/[0.04] dark:border-white/[0.06] hover:border-[#007AFF] text-left transition active:scale-95">
+                  <span class="text-[10px] font-bold text-[#007AFF] block">🔄 Handover</span>
+                  <span class="font-medium text-[#1C1C1E] dark:text-white truncate block">Shift Log JSON</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Privacy & Data Purge Notice -->
+            <div class="pt-3 border-t border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2 text-slate-500 dark:text-zinc-400 text-[11px]">
+                <span>🔒 Zero-Cloud In-Memory Processing</span>
+              </div>
+              <button onclick="purgeAllShiftData()" class="text-[10px] font-bold text-[#FF3B30] hover:underline">
+                Purge All Local Shift Data
+              </button>
+            </div>
+
+            <!-- Action Bar at bottom of Transformer Form -->
+            <div class="pt-4 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <button type="button" onclick="switchHub3MobileView('preview')" class="flex-1 py-3 px-4 bg-[#007AFF] hover:bg-blue-600 text-white text-xs font-bold rounded-2xl shadow-sm flex items-center justify-center gap-2 active:scale-95 transition">
+                <span>📄 View / Print Transformed Clinical Document</span>
+                <span>→</span>
+              </button>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="shareActiveLegalSlip()" class="flex-1 sm:flex-none px-4 py-3 bg-[#34C759] hover:bg-emerald-600 text-white text-xs font-semibold rounded-2xl transition flex items-center justify-center gap-1.5 shadow-2xs active:scale-95">
+                  <span>📲 WhatsApp</span>
+                </button>
+                <button type="button" onclick="printActiveLegalSlip()" class="px-4 py-3 bg-[#1C1C1E] dark:bg-white text-white dark:text-[#1C1C1E] text-xs font-semibold rounded-2xl transition shadow-2xs active:scale-95">
+                  🖨️ Print
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-FORM 4: POST-MORTEM & SOBRIETY -->
+          <div id="legal-form-autopsy" class="hidden space-y-4">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-[#5856D6]">Post-Mortem & Sobriety</span>
+              <h3 class="text-sm font-bold text-[#1C1C1E] dark:text-white">Autopsy Clues & Drunkenness Checklist</h3>
+            </div>
+            <div id="pm-rules-container" class="space-y-2 text-xs text-slate-600 dark:text-zinc-300"></div>
+
+            <!-- Action Bar at bottom of Autopsy Reference -->
+            <div class="pt-4 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <button type="button" onclick="switchHub3MobileView('preview')" class="flex-1 py-3 px-4 bg-[#5856D6] hover:bg-indigo-600 text-white text-xs font-bold rounded-2xl shadow-sm flex items-center justify-center gap-2 active:scale-95 transition">
+                <span>🔍 View Statutory Autopsy / Sobriety Reference</span>
+                <span>→</span>
+              </button>
+              <button type="button" onclick="printActiveLegalSlip()" class="px-4 py-3 bg-[#1C1C1E] dark:bg-white text-white dark:text-[#1C1C1E] text-xs font-semibold rounded-2xl transition shadow-2xs active:scale-95">
+                🖨️ Print
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Pane: Live Official Clinical Stationery Preview & Actions -->
+        <div id="hub3-right-pane" class="hidden lg:block lg:col-span-6 bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl rounded-3xl border border-black/[0.06] dark:border-white/[0.08] p-4 sm:p-6 shadow-ios dark:shadow-ios-dark space-y-4">
+          <div>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-black/[0.06] dark:border-white/[0.08] pb-3 gap-2">
+              <div class="flex items-center gap-2">
+                <span id="legal-preview-dot" class="w-2.5 h-2.5 rounded-full bg-[#34C759]"></span>
+                <h3 id="legal-preview-title" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-zinc-300">Generated Pre-Referral Slip</h3>
+              </div>
+              <div class="flex flex-wrap items-center gap-1.5">
+                <button id="legal-btn-whatsapp" onclick="shareActiveLegalSlip()" class="flex items-center gap-1 px-3.5 py-1.5 bg-[#34C759] hover:bg-emerald-600 text-white text-xs font-semibold rounded-full shadow-2xs transition active:scale-95">
+                  <span>📲 WhatsApp</span>
+                </button>
+                <button id="legal-btn-copy" onclick="copyActiveLegalSlip()" class="px-3.5 py-1.5 bg-[#F2F2F7] dark:bg-[#2C2C2E] hover:bg-slate-200 dark:hover:bg-[#3A3A3C] text-[#1C1C1E] dark:text-zinc-200 text-xs font-medium rounded-full border border-black/[0.04] dark:border-white/[0.06] transition active:scale-95">
+                  Copy
+                </button>
+                <button onclick="printActiveLegalSlip()" class="px-3.5 py-1.5 bg-[#1C1C1E] dark:bg-white text-white dark:text-[#1C1C1E] text-xs font-medium rounded-full transition active:scale-95">
+                  Print A4
+                </button>
+                <button onclick="printThermalLegalSlip()" class="px-3.5 py-1.5 bg-[#2C2C2E] hover:bg-[#3A3A3C] text-zinc-200 text-xs font-medium rounded-full border border-white/10 transition active:scale-95" title="Print 58mm/80mm Thermal Receipt">
+                  🧾 Thermal
+                </button>
+                <button onclick="switchHub3MobileView('form')" class="lg:hidden px-3.5 py-1.5 bg-[#F2F2F7] dark:bg-[#2C2C2E] text-slate-700 dark:text-zinc-200 text-xs font-bold rounded-full transition active:scale-95">
+                  ← Back to Form
+                </button>
+              </div>
+            </div>
+
+            <!-- Official Document Preview Box -->
+            <pre id="legal-active-preview-text" class="mt-4 p-4 bg-[#F2F2F7]/60 dark:bg-[#000000]/60 border border-black/[0.06] dark:border-white/[0.08] rounded-2xl text-[11px] font-mono leading-relaxed text-[#1C1C1E] dark:text-zinc-200 whitespace-pre-wrap select-all overflow-x-auto max-h-[520px]"></pre>
+
+            <!-- Bottom Action Controls inside Document Preview -->
+            <div class="mt-4 pt-3 border-t border-black/[0.06] dark:border-white/[0.08] flex flex-wrap items-center justify-between gap-2">
+              <button type="button" onclick="switchHub3MobileView('form')" class="lg:hidden px-4 py-2.5 bg-[#F2F2F7] dark:bg-[#2C2C2E] text-[#1C1C1E] dark:text-white text-xs font-bold rounded-2xl transition active:scale-95">
+                ← Back to Form Editor
+              </button>
+              <div class="flex items-center gap-2 ml-auto">
+                <button onclick="shareActiveLegalSlip()" class="px-4 py-2.5 bg-[#34C759] hover:bg-emerald-600 text-white text-xs font-semibold rounded-2xl shadow-2xs transition active:scale-95">
+                  <span>📲 WhatsApp</span>
+                </button>
+                <button onclick="printActiveLegalSlip()" class="px-4 py-2.5 bg-[#1C1C1E] dark:bg-white text-white dark:text-[#1C1C1E] text-xs font-semibold rounded-2xl transition active:scale-95">
+                  Print A4
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-[10px] text-slate-400 dark:text-zinc-400 mt-3 italic">
+            *Assistive clinical reference and draft summary generator for Registered Medical Practitioners. Final clinical diagnosis, treatment decisions, and statutory document validation remain the sole responsibility of the attending Medical Officer.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOBUSWORK OFFICIAL CLINICAL HUD FOOTER -->
+    <footer class="mt-12 pt-8 border-t border-black/[0.06] dark:border-white/[0.08] space-y-6 no-print">
+      
+      <!-- Top Callout: Zero Cloud Storage & Clinical Privacy -->
+      <div class="p-5 sm:p-6 rounded-3xl bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl border border-black/[0.06] dark:border-white/[0.08] shadow-ios dark:shadow-ios-dark flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="flex items-start gap-3.5">
+          <div class="w-10 h-10 rounded-2xl bg-[#007AFF]/10 border border-[#007AFF]/20 flex items-center justify-center text-[#007AFF] shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <h4 class="font-bold text-[#1C1C1E] dark:text-white text-xs sm:text-sm flex items-center gap-2">
+              <span>Zero Cloud Data Storage · 100% In-Memory & Client-Side Execution</span>
+              <span class="w-2 h-2 rounded-full bg-[#34C759]"></span>
+            </h4>
+            <p class="text-slate-500 dark:text-zinc-400 text-[11px] sm:text-xs mt-1 max-w-2xl leading-relaxed">
+              All clinical calculations, pediatric dosage algorithms, and medico-legal summaries execute purely in-memory and local browser storage. Zero patient identifying data (PHI) or vitals are ever transmitted over external networks.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-[11px] font-mono font-bold text-slate-700 dark:text-zinc-300 bg-[#F2F2F7] dark:bg-[#2C2C2E] px-3.5 py-1.5 rounded-full border border-black/[0.04] dark:border-white/[0.06] whitespace-nowrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Offline PWA · 0ms Latency</span>
+        </div>
+      </div>
+
+      <!-- Nobuswork Engineering Information Card -->
+      <div class="p-6 sm:p-7 rounded-3xl bg-[#1C1C1E] dark:bg-[#111111] text-white border border-black/10 dark:border-white/10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 shadow-ios">
+        <div class="space-y-2 max-w-2xl">
+          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase bg-white/10 text-white/90 border border-white/10 tracking-wider">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>
+            <span>Software Engineering by Nobuswork</span>
+          </div>
+          <h3 class="text-base sm:text-lg font-bold text-white tracking-tight">
+            DocShift — Clinical Operating HUD
+          </h3>
+          <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+            Nobuswork engineers focused, high-precision digital utilities and specialized mission-critical instruments. DocShift was engineered to eliminate cognitive calculation fatigue, reduce medication dosing errors, and streamline statutory medico-legal documentation for Medical Officers across India.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto shrink-0">
+          <a
+            href="https://nobuswork.pages.dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-[#1C1C1E] font-bold text-xs hover:bg-zinc-100 active:scale-95 transition-all shadow-md group"
+          >
+            <span>Explore on nobuswork.pages.dev</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-zinc-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Statutory Medical & Forensic Disclaimer -->
+      <div class="p-4 sm:p-5 rounded-2xl bg-[#F2F2F7]/70 dark:bg-[#2C2C2E]/60 border border-black/[0.04] dark:border-white/[0.06] text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
+        <p class="font-semibold text-slate-700 dark:text-zinc-300 mb-1">Statutory Assistive Reference Notice (Duty Medical Officers):</p>
+        DocShift is an assistive clinical calculation and draft summary generator for Registered Medical Practitioners (RMPs) in India. Guidelines are compiled from ICMR (Snakebite & Resuscitation), IAP (Pediatric Drug Formulary), WHO/NCDC (Rabies PEP & Toxicology), and Bharatiya Nyaya Sanhita 2023 (BNS Section 116 Grievous Hurt). Final clinical diagnosis, drug administration, patient management, and statutory document validation remain the sole legal and ethical responsibility of the attending Medical Officer.
+      </div>
+
+      <!-- Bottom Bar Links & Credits -->
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-4 border-t border-black/[0.06] dark:border-white/[0.08] text-[11px] text-slate-500 dark:text-zinc-400">
+        <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
+          <span class="font-bold text-[#1C1C1E] dark:text-white">DocShift v2.2.0-ios</span>
+          <span>·</span>
+          <span>© 2026 <strong>Nobuswork</strong>. All rights reserved.</span>
+          <span class="hidden sm:inline">·</span>
+          <span class="hidden sm:inline">Designed for Primary & Secondary Healthcare.</span>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <button onclick="switchHub('opd')" class="hover:text-[#007AFF] transition-colors">OPD Dosing</button>
+          <button onclick="switchHub('emergency')" class="hover:text-[#FF3B30] transition-colors">Casualty Resus</button>
+          <button onclick="switchHub('legal')" class="hover:text-[#FF9500] transition-colors">Forensic Shield</button>
+          <button onclick="openSearchModal()" class="hover:text-[#007AFF] transition-colors font-mono">⌘K Search</button>
+          <a href="https://nobuswork.pages.dev" target="_blank" rel="noopener noreferrer" class="hover:text-[#007AFF] font-bold inline-flex items-center gap-1 transition-colors">
+            <span>nobuswork.pages.dev</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- MOBILE SCROLL CLEARANCE SPACER -->
+    <div class="h-24 md:hidden" aria-hidden="true"></div>
+
+  </main>
+
+  <!-- UNIVERSAL COMMAND PALETTE (CMD+K / CTRL+K) MODAL OVERLAY -->
+  <div id="search-modal-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-start justify-center pt-16 px-4" role="dialog" aria-modal="true">
+    <div class="bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-2xl border border-black/[0.06] dark:border-white/[0.08] w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden transition-all transform duration-150">
+      <div class="p-3.5 border-b border-black/[0.06] dark:border-white/[0.08] flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-slate-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="global-search-modal-input" type="text" placeholder="Search drug, protocol, ECG, toxidrome, BNS law..." class="w-full text-sm bg-transparent border-0 focus:outline-none text-[#1C1C1E] dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500">
+        <kbd onclick="closeSearchModal()" class="cursor-pointer text-[10px] font-mono bg-[#F2F2F7] dark:bg-[#2C2C2E] px-2.5 py-1 rounded-full text-slate-500 hover:text-[#1C1C1E] dark:hover:text-white">ESC</kbd>
+      </div>
+      <div id="search-results-container" class="max-h-80 overflow-y-auto p-2 space-y-1 text-xs">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE TACTILE BOTTOM DOCK (APPLE TAB BAR DESIGN) -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/85 dark:bg-[#1C1C1E]/85 backdrop-blur-2xl border-t border-black/[0.08] dark:border-white/[0.12] z-50 flex items-center justify-around h-16 shadow-2xl transition-colors" style="padding-bottom: env(safe-area-inset-bottom, 8px);">
+    <button onclick="switchHub('opd')" class="mobile-hub-btn flex flex-col items-center justify-center w-full h-full text-[10px] font-bold text-[#007AFF] focus:outline-none active:scale-95 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M10 16c.5.5 1.5.5 2 0"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"/></svg>
+      <span class="mt-0.5">OPD Desk</span>
+    </button>
+    <button onclick="switchHub('emergency')" class="mobile-hub-btn flex flex-col items-center justify-center w-full h-full text-[10px] font-bold text-slate-400 hover:text-[#FF3B30] focus:outline-none active:scale-95 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+      <span class="mt-0.5">Casualty</span>
+    </button>
+    <button onclick="switchHub('legal')" class="mobile-hub-btn flex flex-col items-center justify-center w-full h-full text-[10px] font-bold text-slate-400 hover:text-[#FF9500] focus:outline-none active:scale-95 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/></svg>
+      <span class="mt-0.5">Forensic/Ref</span>
+    </button>
+  </nav>
+
+  <!-- SCRIPTS -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => {
+            console.log('[DocShift] Service Worker active:', reg.scope);
+            reg.update();
+          })
+          .catch(err => console.log('[DocShift] Service Worker failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
